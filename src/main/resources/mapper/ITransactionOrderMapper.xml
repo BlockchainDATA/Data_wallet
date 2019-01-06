@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blockchain.wallet.mapper.ITransactionOrderMapper">
+    <sql id="Column_list">
+        id,transaction_id as transactionId,from_addr as fromAddr,to_addr as toAddr
+        ,value,fee,state,create_time as createTime,update_time as updateTime,memo,type
+    </sql>
+    <select id="findState" resultType="TransactionOrderEntity">
+        select
+        <include refid="Column_list"/>
+        from transaction_order
+        where state=#{state}
+    </select>
+    <select id="findStateAndType" resultType="TransactionOrderEntity">
+        select
+        <include refid="Column_list"/>
+        from transaction_order
+        where state=#{state} and type=#{type}
+    </select>
+    <insert id="insertTransactionOrder" parameterType="TransactionOrderEntity">
+        insert into transaction_order  (transaction_id,from_addr,to_addr,value,fee,state,create_time,type,memo)
+        values (#{transactionId},#{fromAddr},#{toAddr},#{value},#{fee},#{state},#{createTime},#{type},#{memo})
+    </insert>
+    <insert id="batchInsertTxOrder" parameterType="TransactionOrderEntity">
+        insert into transaction_order (transaction_id,from_addr,to_addr,value,fee,state,create_time,type,memo)
+        values
+        <foreach collection="list" item="it" separator=",">
+            (#{it.transactionId},#{it.fromAddr},#{it.toAddr},#{it.value},#{it.fee},#{it.state},#{it.createTime},#{it.type},#{it.memo})
+        </foreach>
+    </insert>
+    <update id="updateTransactionOrderEntity">
+        update transaction_order
+        <set>
+            <if test="state !=null">
+                state=#{state},
+            </if>
+            update_time=#{dateTime}
+        </set>
+        where
+        transaction_id=#{transactionId}
+    </update>
+    <update id="batchUpdateTxOrder" parameterType="TransactionOrderEntity">
+        <foreach collection="list" item="it" separator=";">
+            update transaction_order
+            <set>
+                <if test="it.transactionId != null">
+                    transaction_id=#{it.transactionId},
+                </if>
+                <if test="it.fromAddr != null">
+                    from_addr=#{it.fromAddr},
+                </if>
+                <if test="it.toAddr !=null">
+                    to_addr=#{it.toAddr},
+                </if>
+                <if test="it.value != null">
+                    value=#{it.value},
+                </if>
+                <if test="it.fee != null">
+                    fee=#{it.fee},
+                </if>
+                <if test="it.state !=null">
+                    state=#{it.state},
+                </if>
+                update_time=#{it.updateTime}
+            </set>
+            where id=#{it.id}
+        </foreach>
+    </update>
+    <select id="findTxIdList" resultType="TransactionOrderEntity">
+        select
+        <include refid="Column_list"/>
+        from transaction_order
+        where transaction_id in
+        <foreach collection="list" separator="," item="it" open="(" close=")">
+            #{it}
+        </foreach>
+    </select>
+    <select id="findTxId" resultType="TransactionOrderEntity">
+        select
+        <include refid="Column_list"/>
+        from transaction_order
+        where transaction_id = #{txId}
+    </select>
+    <select id="findFromAddress" resultType="TransactionOrderEntity">
+        select
+        <include refid="Column_list"/>
+        from transaction_order
+        where from_addr = #{fromAddress} and type = #{type}
+    </select>
+</mapper>

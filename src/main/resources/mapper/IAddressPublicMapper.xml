@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blockchain.wallet.mapper.IAddressPublicMapper">
+    <sql id="Column_List">
+        id,wallet_address as walletAddress ,private_key as privateKey,addr_type as addrType,
+        nonce,eth_balance as ethBalance,dta_balance as dtaBalance,state,create_time as createTime,update_time as updateTime
+    </sql>
+
+    <update id="updateAddressPublic" parameterType="AddressPublicEntity">
+        update address_public
+        <set>
+            <if test="nonce !=null">
+                nonce=#{nonce},
+            </if>
+            <if test="ethBalance !=null">
+                eth_balance=#{ethBalance},
+            </if>
+            <if test="dtaBalance !=null">
+                dta_balance=#{dtaBalance},
+            </if>
+            <if test="state !=null">
+                state=#{state},
+            </if>
+            update_time=#{updateTime}
+        </set>
+        where
+        wallet_address=#{walletAddress}
+    </update>
+    <update id="batchUpdateAddressPublic" parameterType="AddressPublicEntity">
+        <foreach collection="list" item="it" separator=";">
+            update address_public
+            <set>
+                <if test="it.nonce !=null">
+                    nonce=#{it.nonce},
+                </if>
+                <if test="it.ethBalance !=null">
+                    eth_balance=#{it.ethBalance},
+                </if>
+                <if test="it.dtaBalance !=null">
+                    dta_balance=#{it.dtaBalance},
+                </if>
+                <if test="it.state !=null">
+                    state=#{it.state},
+                </if>
+                update_time=#{it.updateTime}
+            </set>
+            where
+            wallet_address=#{it.walletAddress}
+        </foreach>
+    </update>
+    <select id="findStateAndType" resultType="AddressPublicEntity">
+        select
+        <include refid="Column_List"/>
+        from address_public where state=#{state} and addr_type=#{addrType}
+    </select>
+    <select id="findAddress" resultType="AddressPublicEntity">
+        select
+        <include refid="Column_List"/>
+        from address_public where wallet_address in
+        <foreach collection="list" item="it" open="(" close=")" separator=",">
+            #{it}
+        </foreach>
+    </select>
+    <select id="findStateAndTypeAndValue" resultType="AddressPublicEntity">
+        select
+        <include refid="Column_List"/>
+        from address_public where state=#{state} and addr_type=#{type} and eth_balance &gt;= ${ethValue} and dta_balance &gt;= ${dtaValue}
+    </select>
+</mapper>

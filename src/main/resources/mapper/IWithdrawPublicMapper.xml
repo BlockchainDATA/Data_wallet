@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blockchain.wallet.mapper.IWithdrawPublicMapper">
+
+    <sql id="Column_List">
+        id,transaction_id as transactionId,private_transaction_id as privateTransactionId,public_transaction_hash as publicTransactionHash,public_from as publicFrom,
+        public_to as publicTo,private_from as privateFrom,private_to as privateTo,value,gas_price as gasPrice,gas_limit as gasLimit,
+        gas_used as gasUsed,nonce,state,create_time as createTime,update_time as updateTime,block_number as blockNumber ,memo
+    </sql>
+
+    <insert id="batchInsertWithdrawPublic" parameterType="WithdrawPublicEntity">
+        insert into withdraw_public
+        (transaction_id,private_transaction_id,public_from,public_to,private_from,private_to,value,state,create_time,memo)
+        values
+        <foreach collection="list" item="it" separator=",">
+            (#{it.transactionId},#{it.privateTransactionId},#{it.publicFrom},#{it.publicTo},
+            #{it.privateFrom},#{it.privateTo},#{it.value},#{it.state},#{it.createTime},#{it.memo})
+        </foreach>
+    </insert>
+    <insert id="insertWithdrawPublic" parameterType="WithdrawPublicEntity">
+        insert into withdraw_public (transaction_id,private_transaction_id,public_from,public_to,private_from,private_to,value,state,create_time,memo) values
+            (#{transactionId},#{privateTransactionId},#{publicFrom},#{publicTo},
+            #{privateFrom},#{privateTo},#{value},#{state},#{createTime},#{memo})
+    </insert>
+    <select id="findState" parameterType="int" resultType="WithdrawPublicEntity">
+        select
+        <include refid="Column_List"/>
+        from withdraw_public where state=#{state}
+    </select>
+    <update id="batchUpdateWithdrawPublic" parameterType="WithdrawPublicEntity">
+        <foreach collection="list" item="it" separator=";">
+            update withdraw_public set
+            <if test="it.transactionId != null">
+                transaction_id=#{it.transactionId},
+            </if>
+            <if test="it.privateTransactionId != null">
+                private_transaction_id=#{it.privateTransactionId},
+            </if>
+            <if test="it.publicTransactionHash != null">
+                public_transaction_hash=#{it.publicTransactionHash},
+            </if>
+            <if test="it.publicFrom != null">
+                public_from=#{it.publicFrom},
+            </if>
+            <if test="it.publicTo != null">
+                public_to=#{it.publicTo},
+            </if>
+            <if test="it.privateFrom != null">
+                private_from=#{it.privateFrom},
+            </if>
+            <if test="it.privateTo != null">
+                private_to=#{it.privateTo},
+            </if>
+            <if test="it.value != null">
+                value=#{it.value},
+            </if>
+            <if test="it.gasPrice != null">
+                gas_price=#{it.gasPrice},
+            </if>
+            <if test="it.gasLimit != null">
+                gas_limit=#{it.gasLimit},
+            </if>
+            <if test="it.gasUsed != null">
+                gas_used=#{it.gasUsed},
+            </if>
+            <if test="it.nonce != null">
+                nonce=#{it.nonce},
+            </if>
+            <if test="it.state != null">
+                state=#{it.state},
+            </if>
+            <if test="it.blockNumber">
+                block_number=#{it.blockNumber},
+            </if>
+            update_time=#{it.updateTime}
+            where
+            id=#{it.id}
+        </foreach>
+    </update>
+    <select id="findWithdrawDetail" resultType="WithdrawPublicEntity">
+        select
+        <include refid="Column_List"/>
+        from withdraw_public where transaction_id=#{transactionId}
+    </select>
+</mapper>

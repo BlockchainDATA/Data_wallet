@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blockchain.wallet.mapper.IScanBlockConfigMapper">
+    <sql id="Column_List">
+        config_key as configKey ,config_value as configValue
+    </sql>
+
+    <select id="getScanBlockConfig" resultType="ScanBlockConfigEntity">
+        select  <include refid="Column_List"/>
+        from scan_block_config where config_key=#{key}
+    </select>
+
+    <insert id="insert" parameterType="ScanBlockConfigEntity">
+        insert into scan_block_config(config_key,config_value)
+        values (#{configKey},#{configValue})
+    </insert>
+    <update id="update">
+        update scan_block_config set config_value=#{configValue}
+        where config_key=#{configKey}
+    </update>
+</mapper>

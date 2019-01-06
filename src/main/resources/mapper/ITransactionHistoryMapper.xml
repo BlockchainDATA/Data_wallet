@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blockchain.wallet.mapper.ITransactionHistoryMapper">
+    <sql id="Column_List">
+        id,transaction_id as transactionId,transaction_hash as transactionHash,transaction_from as transactionFrom,
+        transaction_to as transactionTo,value,gas_price as gasPrice,gas_limit as gasLimit,
+        gas_used as gasUsed,nonce,transaction_type as transactionType,sign,state,create_time as createTime,update_time as updateTime,
+        block_hash as blockHash,block_number as blockNumber
+
+    </sql>
+
+    <sql id="Query_List">
+        id,transaction_id as transactionId,transaction_hash as transactionHash,transaction_from as transactionFrom,
+        transaction_to as transactionTo,value,state,create_time as createTime,
+        block_hash as blockHash,block_number as blockNumber
+    </sql>
+
+    <sql id="update">
+        <if test="transactionId != null">
+            transaction_id=#{transactionId},
+        </if>
+        <if test="transactionHash != null">
+            transaction_hash=#{transactionHash},
+        </if>
+        <if test="transactionFrom != null">
+            transaction_from=#{transactionFrom},
+        </if>
+        <if test="transactionTo != null">
+            transaction_to=#{transactionTo},
+        </if>
+        <if test="value != null">
+            value=#{value},
+        </if>
+        <if test="gasPrice != null">
+            gas_price=#{gasPrice},
+        </if>
+        <if test="gasLimit != null">
+            gas_limit=#{gasLimit},
+        </if>
+        <if test="gasUsed != null">
+            gas_used=#{gasUsed},
+        </if>
+        <if test="nonce != null">
+            nonce=#{nonce},
+        </if>
+        <if test="transactionType != null">
+            transaction_type=#{transactionType},
+        </if>
+        <if test="sign != null">
+            sign=#{sign},
+        </if>
+        <if test="state != null">
+            state=#{state},
+        </if>
+
+        <if test="blockHash != null">
+            block_hash=#{blockHash},
+        </if>
+        <if test="blockNumber != null">
+            block_number=#{blockNumber},
+        </if>
+        update_time=#{updateTime}
+    </sql>
+    <insert id="insertTransactionHistoryEntity" parameterType="TransactionHistoryEntity">
+        insert into transaction_history  (transaction_id,transaction_from,
+        transaction_to,value,gas_price,gas_limit,nonce,transaction_type ,state,create_time,block_hash,block_number)
+        values (#{transactionId},#{transactionFrom},#{transactionTo},#{value},
+        #{gasPrice},#{gasLimit},#{nonce},#{transactionType},#{state},#{createTime},#{blockHash},#{blockNumber})
+    </insert>
+
+    <update id="updateTransactionHistoryEntity" parameterType="TransactionHistoryEntity">
+        update transaction_history
+        <include refid="update"/>
+        where
+        id=#{id}
+
+    </update>
+
+    <select id="findState" resultType="TransactionHistoryEntity" parameterType="int">
+        select
+        <include refid="Column_List"/>
+        from transaction_history
+        where
+        state=#{state}
+
+    </select>
+
+    <insert id="batchInsertTxHistoryEntity" parameterType="TransactionHistoryEntity">
+        insert into transaction_history (transaction_id,transaction_hash,transaction_from,
+        transaction_to,value,gas_price,gas_limit,gas_used,nonce,transaction_type
+        ,sign,state,create_time,block_hash,block_number) values
+        <foreach collection="list" separator="," item="it">
+            (#{it.transactionId},#{it.transactionHash},#{it.transactionFrom},#{it.transactionTo},#{it.value},
+            #{it.gasPrice},#{it.gasLimit},#{it.gasUsed},#{it.nonce},#{it.transactionType},#{it.sign},#{it.state},#{it.createTime},#{it.blockHash},#{it.blockNumber})
+        </foreach>
+    </insert>
+
+    <update id="batchUpdateTxHistoryList" parameterType="TransactionHistoryEntity">
+        <foreach collection="list" separator=";" item="it">
+            update transaction_history set
+            <if test="it.transactionId != null">
+                transaction_id=#{it.transactionId},
+            </if>
+            <if test="it.transactionHash != null">
+                transaction_hash=#{it.transactionHash},
+            </if>
+            <if test="it.transactionFrom != null">
+                transaction_from=#{it.transactionFrom},
+            </if>
+            <if test="it.transactionTo != null">
+                transaction_to=#{it.transactionTo},
+            </if>
+            <if test="it.value != null">
+                value=#{it.value},
+            </if>
+            <if test="it.gasPrice != null">
+                gas_price=#{it.gasPrice},
+            </if>
+            <if test="it.gasLimit != null">
+                gas_limit=#{it.gasLimit},
+            </if>
+            <if test="it.gasUsed != null">
+                gas_used=#{it.gasUsed},
+            </if>
+            <if test="it.nonce != null">
+                nonce=#{it.nonce},
+            </if>
+            <if test="it.transactionType != null">
+                transaction_type=#{it.transactionType},
+            </if>
+            <if test="it.sign != null">
+                sign=#{it.sign},
+            </if>
+            <if test="it.state != null">
+                state=#{it.state},
+            </if>
+
+            <if test="it.blockHash != null">
+                block_hash=#{it.blockHash},
+            </if>
+            <if test="it.blockNumber != null">
+                block_number=#{it.blockNumber},
+            </if>
+            update_time=#{it.updateTime}
+            where
+            id=#{it.id}
+        </foreach>
+    </update>
+    <select id="findStateAndTypeTxHistory" resultType="TransactionHistoryEntity">
+        select
+        <include refid="Column_List"/>
+        from transaction_history
+        where
+        state=#{state} and transaction_type=#{type}
+    </select>
+
+    <select id="findAddrTxHistory" resultType="TransactionHistoryEntity">
+        select
+        <include refid="Query_List"/>
+        from transaction_history
+        where
+        <if test="txType == 1 || txType == 3">
+            transaction_to=#{addr} and transaction_type=#{txType}
+        </if>
+        <if test="txType == 2 || txType == 4">
+            transaction_from=#{addr} and transaction_type=#{txType}
+        </if>
+    </select>
+
+    <select id="findTransactionHistory" resultType="TransactionHistoryEntity">
+        select
+        <include refid="Column_List"/>
+        from transaction_history
+        where transaction_id=#{transactionId}
+    </select>
+</mapper>

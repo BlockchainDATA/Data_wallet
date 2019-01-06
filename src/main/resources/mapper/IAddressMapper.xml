@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blockchain.wallet.mapper.IAddressMapper">
+    <sql id="Column_List">
+        id,wallet_address as walletAddress ,private_key as privateKey,nonce,
+        balance,state,addr_type as addrType,create_time as createTime,update_time as updateTime
+    </sql>
+    <insert id="insertAddressEntity" parameterType="AddressEntity">
+        insert into address(wallet_address,private_key,create_time,password,addr_type) values (#{walletAddress},#{privateKey},#{createTime},#{password},#{addrType})
+    </insert>
+    <select id="findAddress" parameterType="String" resultType="AddressEntity">
+        select
+        <include refid="Column_List"/>
+        from address where wallet_address=#{addr}
+    </select>
+
+    <select id="findAddrAndState" resultType="AddressEntity">
+        select
+        <include refid="Column_List"/>
+        from address where wallet_address=#{addr} and state=#{state}
+    </select>
+
+    <update id="updateAddressEntity">
+        update address
+        <set>
+            <if test="nonce !=null">
+                nonce=#{nonce},
+            </if>
+            <if test="balance !=null">
+                balance=#{balance},
+            </if>
+            <if test="state !=null">
+                state=#{state},
+            </if>
+            update_time=#{updateTime}
+        </set>
+        where
+        id=#{id}
+
+    </update>
+    <update id="updateBalance">
+        update address set balance=#{balance},update_time=#{dateTime} where wallet_address=#{addr}
+    </update>
+    <update id="batchUpdateAddressList">
+        <foreach collection="list" separator=";" item="it">
+            update address
+            <set>
+                <if test="it.nonce !=null">
+                    nonce=#{it.nonce},
+                </if>
+                <if test="it.balance !=null">
+                    balance=#{it.balance},
+                </if>
+                <if test="it.state !=null">
+                    state=#{it.state},
+                </if>
+                update_time=#{it.updateTime}
+            </set>
+            where
+            id=#{it.id}
+        </foreach>
+    </update>
+
+    <select id="findAddressList" resultType="AddressEntity">
+        select
+        <include refid="Column_List"/>
+        from address
+        where
+        wallet_address in
+        <foreach collection="list" item="it" separator="," open="(" close=")">
+            #{it}
+        </foreach>
+    </select>
+
+    <select id="findStateAndType" resultType="AddressEntity">
+        select
+        <include refid="Column_List"/>
+        from address where state=#{state} and addr_type=#{type}
+    </select>
+    <select id="findStateAndTypeAndValue" resultType="AddressEntity">
+        select
+        <include refid="Column_List"/>
+        from address where state=#{state} and addr_type=#{type} and balance &gt;= ${value}
+    </select>
+
+    <select id="findType" resultType="AddressEntity" parameterType="int">
+        select
+        <include refid="Column_List"/>
+        from address where addr_type=#{addrType}
+    </select>
+</mapper>
