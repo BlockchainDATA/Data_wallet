@@ -44,6 +44,7 @@ public interface IAddressService {
 
     /**
      * 根据地址更新余额
+     *
      * @param addr
      * @param balance
      */
@@ -84,11 +85,18 @@ public interface IAddressService {
 
     /**
      * 根据状态和类型查询地址和金额查询用户地址
+     *
      * @param state 状态
-     * @param type 类型
+     * @param type  类型
      * @param value 金额
      * @return
      */
-    List<AddressEntity> findStateAndTypeAndValue(Integer state, Integer type,String value);
+    List<AddressEntity> findStateAndTypeAndValue(Integer state, Integer type, String value);
+
+    /**
+     *
+     * @param type
+     */
+    void setAddressQueue(Integer type);
 
 }

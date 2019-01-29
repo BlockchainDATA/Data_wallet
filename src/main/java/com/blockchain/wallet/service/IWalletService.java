@@ -3,7 +3,9 @@ package com.blockchain.wallet.service;
 
 import com.blockchain.wallet.entity.*;
 
+import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -14,10 +16,10 @@ import java.util.List;
 public interface IWalletService {
     /**
      * 创建钱包地址
-     *
+     * @param type
      * @return 地址
      */
-    String createAddr();
+    String createAddr(Integer type);
 
     /**
      * 根据用户地址查询用户信息
@@ -94,6 +96,7 @@ public interface IWalletService {
 
     /**
      * 通过交易ID获取私有链的交易hash
+     *
      * @param transactionId 交易ID
      * @return
      */
@@ -102,12 +105,19 @@ public interface IWalletService {
 
     /**
      * 使用私钥转账
+     *
      * @param fromAddress from地址
-     * @param toAddress to地址
-     * @param privateKey 私钥
-     * @param value 金额
+     * @param toAddress   to地址
+     * @param privateKey  私钥
+     * @param value       金额
      * @return 交易Hash
      */
-    String privateKeyTransfer(String fromAddress,String toAddress,String privateKey,String value);
+    String privateKeyTransfer(String fromAddress, String toAddress, String privateKey, String value);
+
+    /**
+     * 获取扫块的配置
+     * @return
+     */
+    Map<String,BigInteger> getScanBlockConfig();
 
 }

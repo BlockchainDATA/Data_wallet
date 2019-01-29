@@ -85,4 +85,10 @@ public interface ITransactionOrderMapper {
      * @return
      */
     List<TransactionOrderEntity> findFromAddress(@Param("fromAddress") String fromAddress, @Param("type") Integer type);
+
+    /**
+     * 更新交易订单
+     * @param txOrder
+     */
+    void updateTransactionOrder(TransactionOrderEntity txOrder);
 }

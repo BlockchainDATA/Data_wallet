@@ -95,4 +95,5 @@ public interface IAddressMapper {
      * @param balance
      */
     void updateBalance(@Param("addr") String addr, @Param("balance") String balance, @Param("dateTime") ZonedDateTime dateTime);
+
 }

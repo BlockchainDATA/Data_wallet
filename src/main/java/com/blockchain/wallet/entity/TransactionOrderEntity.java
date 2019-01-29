@@ -53,6 +53,11 @@ public class TransactionOrderEntity {
      */
     private String memo;
 
+    /**
+     * 重试次数
+     */
+    private Integer retry;
+
     public Long getId() {
         return id;
     }
@@ -139,5 +144,13 @@ public class TransactionOrderEntity {
 
     public void setMemo(String memo) {
         this.memo = memo;
+    }
+
+    public Integer getRetry() {
+        return retry;
+    }
+
+    public void setRetry(Integer retry) {
+        this.retry = retry;
     }
 }

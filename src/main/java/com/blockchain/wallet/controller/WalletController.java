@@ -11,8 +11,12 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @author QiShuo
@@ -35,7 +39,7 @@ public class WalletController {
      */
     @GetMapping("/createAddr")
     public ActionResult<String> createAddr() {
-        String addr = walletService.createAddr();
+        String addr = walletService.createAddr(null);
         if (StringUtils.isEmpty(addr)) {
             return ActionResult.New(1, "创建用户失败");
         }
@@ -209,5 +213,21 @@ public class WalletController {
             return ActionResult.New(1, "参数为空");
         }
         return ActionResult.New(walletService.privateKeyTransfer(paramEntity.getFromAddress(), paramEntity.getToAddress(), paramEntity.getPrivateKey(), paramEntity.getValue()));
+    }
+
+    @GetMapping("/scanBlockConfig")
+    public ActionResult<Map<String, BigInteger>> getScanBlockConfig() {
+        return ActionResult.New(walletService.getScanBlockConfig());
+    }
+
+    @GetMapping("/batchCreateAddr")
+    public Boolean batchCreateAddr(Integer type, Integer number) {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(() -> {
+            for (int i = 0; i < number; i++) {
+                walletService.createAddr(type);
+            }
+        });
+        return true;
     }
 }

@@ -78,4 +78,10 @@ public interface ITransactionOrderService {
      */
     List<TransactionOrderEntity> findFromAddress(String fromAddress,Integer type);
 
+    /**
+     * 更新交易订单
+     * @param txOrder
+     */
+    void updateTransactionOrder(TransactionOrderEntity txOrder);
+
 }

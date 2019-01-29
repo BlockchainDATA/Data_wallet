@@ -74,5 +74,9 @@ dependencies {
     testCompile('org.spockframework:spock-core:1.2-groovy-2.4')
     testCompile('org.spockframework:spock-spring:1.1-groovy-2.4')
     compile('org.springframework.boot:spring-boot-starter-activemq')
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: '2.1.2.RELEASE'
+    compile('org.redisson:redisson:3.7.5')
+
 
 }

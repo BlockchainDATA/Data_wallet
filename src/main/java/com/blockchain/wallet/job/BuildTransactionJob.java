@@ -29,7 +29,6 @@ public class BuildTransactionJob {
     private IBuildTransactionJobService buildTransactionJobService;
     @Resource
     private ITransactionOrderService transactionOrderService;
-
     @Scheduled(fixedRateString = "${job.transaction.job-time}")
     public void buildTransactionJob() {
         log.info("Timing Task Opening for Constructing Transactions...");

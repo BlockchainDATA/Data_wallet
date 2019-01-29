@@ -62,9 +62,9 @@
         update_time=#{updateTime}
     </sql>
     <insert id="insertTransactionHistoryEntity" parameterType="TransactionHistoryEntity">
-        insert into transaction_history  (transaction_id,transaction_from,
+        insert into transaction_history  (transaction_id,transaction_hash,transaction_from,
         transaction_to,value,gas_price,gas_limit,nonce,transaction_type ,state,create_time,block_hash,block_number)
-        values (#{transactionId},#{transactionFrom},#{transactionTo},#{value},
+        values (#{transactionId},#{transactionHash},#{transactionFrom},#{transactionTo},#{value},
         #{gasPrice},#{gasLimit},#{nonce},#{transactionType},#{state},#{createTime},#{blockHash},#{blockNumber})
     </insert>
 

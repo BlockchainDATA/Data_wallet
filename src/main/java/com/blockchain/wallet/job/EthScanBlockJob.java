@@ -5,7 +5,6 @@ import com.blockchain.wallet.enums.ScanKeyEnum;
 import com.blockchain.wallet.service.IScanBlockConfigService;
 import com.blockchain.wallet.service.IScanBlockJobService;
 import com.blockchain.wallet.utils.RandomUtil;
-import com.blockchain.wallet.utils.UrlConstUtil;
 import com.blockchain.wallet.utils.Web3jUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;
+import java.util.List;
 
 /**
  * 扫块定时任务
@@ -34,6 +34,8 @@ public class EthScanBlockJob {
     @Resource
     private IScanBlockConfigService scanBlockConfigService;
 
+    @Value("#{'${privateEth.server}'.split(',')}")
+    public  List<String> ethNodeList;
     @Resource
     private IScanBlockJobService scanBlockJobService;
 
@@ -49,7 +51,7 @@ public class EthScanBlockJob {
             nextScanBlockHeight = blockHeight.add(BigInteger.valueOf(1));
         }
         //链上最高块
-        BigInteger blockHeight = web3jUtil.getBlockHeight(UrlConstUtil.ETH_NODE_LIST.get(RandomUtil.getRandomInt(UrlConstUtil.ETH_NODE_LIST.size())));
+        BigInteger blockHeight = web3jUtil.getBlockHeight(ethNodeList.get(RandomUtil.getRandomInt(ethNodeList.size())));
         if (null == blockHeight) {
             log.error("Acquisition Block High Failure...");
             return;

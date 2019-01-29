@@ -11,7 +11,6 @@ import com.blockchain.wallet.service.IColdTransferJobService;
 import com.blockchain.wallet.service.ITransactionHistoryService;
 import com.blockchain.wallet.utils.CurrencyMathUtil;
 import com.blockchain.wallet.utils.RandomUtil;
-import com.blockchain.wallet.utils.UrlConstUtil;
 import com.blockchain.wallet.utils.Web3jUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +26,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -53,7 +51,8 @@ public class ColdTransferJobServiceImpl implements IColdTransferJobService {
     private String gasLimit;
     @Value("${privateEth.gas-price}")
     private String gasPrice;
-
+    @Value("#{'${privateEth.server}'.split(',')}")
+    public  List<String> ethNodeList;
 
     @Override
     public void coldTransfer() {
@@ -73,7 +72,7 @@ public class ColdTransferJobServiceImpl implements IColdTransferJobService {
             if (AddressStateEnum.UNLOCK.getCode().equals(mainAddr.getState())) {
                 String value = CurrencyMathUtil.subtract(maxBalance, systemAddr.getBalance());
                 String transactionSign = web3jUtil.getETHTransactionSign(mainAddr.getPrivateKey(), mainAddr.getNonce(), systemAddr.getWalletAddress(), gasPrice, new BigInteger(gasLimit), value);
-                String txHash = web3jUtil.getTxHash(transactionSign, UrlConstUtil.ETH_NODE_LIST.get(RandomUtil.getRandomInt(UrlConstUtil.ETH_NODE_LIST.size())));
+                String txHash = web3jUtil.getTxHash(systemAddr.getWalletAddress(),transactionSign, ethNodeList.get(RandomUtil.getRandomInt(ethNodeList.size())));
                 if (StringUtils.isEmpty(txHash)) {
                     log.error("Failed to get txHash,address:{}", mainAddr.getWalletAddress());
                     continue;
@@ -85,7 +84,7 @@ public class ColdTransferJobServiceImpl implements IColdTransferJobService {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    TransactionReceipt transactionReceipt = web3jUtil.getTransactionReceipt(txHash, UrlConstUtil.ETH_NODE_LIST.get(RandomUtil.getRandomInt(UrlConstUtil.ETH_NODE_LIST.size())));
+                    TransactionReceipt transactionReceipt = web3jUtil.getTransactionReceipt(txHash, ethNodeList.get(RandomUtil.getRandomInt(ethNodeList.size())));
                     log.info("Transaction receipt for main account transfer", transactionReceipt);
                     if (!StringUtils.isEmpty(transactionReceipt)) {
                         //交易已经打包在块上
@@ -99,11 +98,11 @@ public class ColdTransferJobServiceImpl implements IColdTransferJobService {
         }
         transactionHistoryService.batchInsertTxHistoryEntity(txHistoryList);
         //获取主账户余额
-        String balance = web3jUtil.getBalance(mainAddr.getWalletAddress(), UrlConstUtil.ETH_NODE_LIST.get(RandomUtil.getRandomInt(UrlConstUtil.ETH_NODE_LIST.size())));
+        String balance = web3jUtil.getBalance(mainAddr.getWalletAddress(), ethNodeList.get(RandomUtil.getRandomInt(ethNodeList.size())));
         if (!StringUtils.isEmpty(balance)) {
             mainAddr.setBalance(balance);
         }
-        BigInteger nonce = web3jUtil.getNonce(mainAddr.getWalletAddress(), UrlConstUtil.ETH_NODE_LIST.get(RandomUtil.getRandomInt(UrlConstUtil.ETH_NODE_LIST.size())));
+        BigInteger nonce = web3jUtil.getNonce(mainAddr.getWalletAddress(), ethNodeList.get(RandomUtil.getRandomInt(ethNodeList.size())));
         if (null != nonce) {
             mainAddr.setNonce(nonce);
         }

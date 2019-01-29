@@ -98,7 +98,7 @@ public class BuildPublicChainTransferJobServiceImpl implements IBuildPublicChain
                 publicTxOrder.setState(TransactionOrderStateEnum.FAIL.getCode());
             }
             //广播交易获取交易hash
-            String txHash = web3jUtil.getTxHash(ercTransactionSign, UrlConstUtil.ETH_PUBLIC_NODE_URL);
+            String txHash = web3jUtil.getTxHash(addressPublicEntity.getWalletAddress(), ercTransactionSign, UrlConstUtil.ETH_PUBLIC_NODE_URL);
             if (StringUtils.isEmpty(txHash)) {
                 log.error("ERC20 Failed to get txHash");
                 //保证from地址下次nonce地址不会出错

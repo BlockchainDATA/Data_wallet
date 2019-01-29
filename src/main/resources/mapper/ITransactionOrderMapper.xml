@@ -3,7 +3,7 @@
 <mapper namespace="com.blockchain.wallet.mapper.ITransactionOrderMapper">
     <sql id="Column_list">
         id,transaction_id as transactionId,from_addr as fromAddr,to_addr as toAddr
-        ,value,fee,state,create_time as createTime,update_time as updateTime,memo,type
+        ,value,fee,state,create_time as createTime,update_time as updateTime,memo,type,retry
     </sql>
     <select id="findState" resultType="TransactionOrderEntity">
         select
@@ -61,6 +61,9 @@
                 <if test="it.state !=null">
                     state=#{it.state},
                 </if>
+                <if test="it.retry !=null">
+                    retry=#{it.retry},
+                </if>
                 update_time=#{it.updateTime}
             </set>
             where id=#{it.id}
@@ -87,4 +90,32 @@
         from transaction_order
         where from_addr = #{fromAddress} and type = #{type}
     </select>
+    <update id="updateTransactionOrder" parameterType="TransactionOrderEntity">
+        update transaction_order
+        <set>
+            <if test="transactionId != null">
+                transaction_id=#{transactionId},
+            </if>
+            <if test="fromAddr != null">
+                from_addr=#{fromAddr},
+            </if>
+            <if test="toAddr !=null">
+                to_addr=#{toAddr},
+            </if>
+            <if test="value != null">
+                value=#{value},
+            </if>
+            <if test="fee != null">
+                fee=#{fee},
+            </if>
+            <if test="state !=null">
+                state=#{state},
+            </if>
+            <if test="retry !=null">
+                retry=#{retry},
+            </if>
+            update_time=#{updateTime}
+        </set>
+        where id=#{id}
+    </update>
 </mapper>

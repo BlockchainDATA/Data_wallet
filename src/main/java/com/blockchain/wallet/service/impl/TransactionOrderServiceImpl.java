@@ -74,4 +74,9 @@ public class TransactionOrderServiceImpl implements ITransactionOrderService {
     public List<TransactionOrderEntity> findFromAddress(String fromAddress, Integer type) {
         return transactionOrderMapper.findFromAddress(fromAddress, type);
     }
+
+    @Override
+    public void updateTransactionOrder(TransactionOrderEntity txOrder) {
+        transactionOrderMapper.updateTransactionOrder(txOrder);
+    }
 }

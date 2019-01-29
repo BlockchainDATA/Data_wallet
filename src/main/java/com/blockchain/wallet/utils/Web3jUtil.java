@@ -52,7 +52,7 @@ public class Web3jUtil {
      * @return
      */
     public AddressEntity createAddr(String ethNodeUrl) {
-        Admin admin = Admin.build(new HttpService(ethNodeUrl + UrlConstUtil.GETH_PORT));
+        Admin admin = Admin.build(new HttpService(ethNodeUrl));
         try {
             //获取随机密码
             String password = randomString();
@@ -103,7 +103,7 @@ public class Web3jUtil {
      * @return
      */
     public String getBalance(String addr, String ethNodeUrl) {
-        Web3j web3j = Web3j.build(new HttpService(ethNodeUrl + UrlConstUtil.GETH_PORT));
+        Web3j web3j = Web3j.build(new HttpService(ethNodeUrl));
         try {
             EthGetBalance response = web3j.ethGetBalance(addr, DefaultBlockParameterName.LATEST).send();
             if (checkResult(response)) {
@@ -192,17 +192,18 @@ public class Web3jUtil {
     /**
      * 广播交易获取txHash
      *
-     * @param hexValue   交易签名
-     * @param ethNodeUrl 节点地址
+     * @param fromAddress from地址用于日志使用
+     * @param hexValue    交易签名
+     * @param ethNodeUrl  节点地址
      * @return
      */
-    public String getTxHash(String hexValue, String ethNodeUrl) {
-        Web3j web3j = Web3j.build(new HttpService(ethNodeUrl + UrlConstUtil.GETH_PORT));
+    public String getTxHash(String fromAddress, String hexValue, String ethNodeUrl) {
+        Web3j web3j = Web3j.build(new HttpService(ethNodeUrl));
         String txHash = null;
         try {
             EthSendTransaction response = web3j.ethSendRawTransaction(hexValue).send();
             if (checkResult(response)) {
-                log.error("Broadcasting Deal Failed,reason:{}", response.getError().getMessage());
+                log.error("Broadcasting Deal Failed,reason:{},fromAddress:{}", response.getError().getMessage(), fromAddress);
                 return null;
             }
             txHash = response.getTransactionHash();
@@ -221,7 +222,7 @@ public class Web3jUtil {
      * @return
      */
     public BigInteger getBlockHeight(String ethNodeUrl) {
-        Web3j web3j = Web3j.build(new HttpService(ethNodeUrl + UrlConstUtil.GETH_PORT));
+        Web3j web3j = Web3j.build(new HttpService(ethNodeUrl));
         try {
             EthBlockNumber response = web3j.ethBlockNumber().send();
             if (checkResult(response)) {
@@ -244,7 +245,7 @@ public class Web3jUtil {
      * @return
      */
     public BigInteger getNonce(String addr, String ethNodeUrl) {
-        Web3j web3j = Web3j.build(new HttpService(ethNodeUrl + UrlConstUtil.GETH_PORT));
+        Web3j web3j = Web3j.build(new HttpService(ethNodeUrl));
         try {
             EthGetTransactionCount response = web3j.ethGetTransactionCount(addr, DefaultBlockParameterName.LATEST).send();
             if (checkResult(response)) {
@@ -268,7 +269,7 @@ public class Web3jUtil {
      * @return
      */
     public TransactionReceipt getTransactionReceipt(String txHash, String ethNodeUrl) {
-        Web3j web3j = Web3j.build(new HttpService(ethNodeUrl + UrlConstUtil.GETH_PORT));
+        Web3j web3j = Web3j.build(new HttpService(ethNodeUrl));
         try {
             EthGetTransactionReceipt response = web3j.ethGetTransactionReceipt(txHash).send();
             if (checkResult(response)) {
@@ -292,7 +293,7 @@ public class Web3jUtil {
      * @return
      */
     public Transaction getTransactionByHash(String txHash, String ethNodeUrl) {
-        Web3j web3j = Web3j.build(new HttpService(ethNodeUrl + UrlConstUtil.GETH_PORT));
+        Web3j web3j = Web3j.build(new HttpService(ethNodeUrl));
         try {
             EthTransaction response = web3j.ethGetTransactionByHash(txHash).send();
             if (checkResult(response)) {
@@ -315,7 +316,7 @@ public class Web3jUtil {
      * @return
      */
     public EthBlock scanBlock(BigInteger blockHeight, String ethNodeUrl) {
-        Web3j web3j = Web3j.build(new HttpService(ethNodeUrl + UrlConstUtil.GETH_PORT));
+        Web3j web3j = Web3j.build(new HttpService(ethNodeUrl));
         try {
             EthBlock response = web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(blockHeight), false).send();
             if (checkResult(response)) {
@@ -379,7 +380,7 @@ public class Web3jUtil {
         JSONObject json = new JSONObject();
         json.put("addr", addr);
         json.put("password", password);
-        return okHttpUtil.postRequest(json, ethNodeUrl + UrlConstUtil.PRIVATE_KEY_PORT);
+        return okHttpUtil.postRequest(json, ethNodeUrl.replace("8545", UrlConstUtil.PRIVATE_KEY_PORT));
     }
 
 }

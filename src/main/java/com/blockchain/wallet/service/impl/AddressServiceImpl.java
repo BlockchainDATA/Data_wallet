@@ -10,6 +10,8 @@ import javax.annotation.Resource;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+import static com.blockchain.wallet.utils.SystemAddressUtil.addressQueue;
+
 /**
  * @author QiShuo
  * @version 1.0
@@ -20,6 +22,8 @@ public class AddressServiceImpl implements IAddressService {
 
     @Resource
     private IAddressMapper addressEntityMapper;
+
+    //public static ConcurrentLinkedQueue<AddressEntity> addressQueue = new ConcurrentLinkedQueue<>();
 
     @Override
     public void insertAddressEntity(AddressEntity addressEntity) {
@@ -43,7 +47,7 @@ public class AddressServiceImpl implements IAddressService {
 
     @Override
     public void updateBalance(String addr, String balance, ZonedDateTime dateTime) {
-        addressEntityMapper.updateBalance(addr, balance,dateTime);
+        addressEntityMapper.updateBalance(addr, balance, dateTime);
     }
 
     @Override
@@ -75,5 +79,10 @@ public class AddressServiceImpl implements IAddressService {
     @Override
     public List<AddressEntity> findStateAndTypeAndValue(Integer state, Integer type, String value) {
         return addressEntityMapper.findStateAndTypeAndValue(state, type, value);
+    }
+
+    @Override
+    public void setAddressQueue(Integer type) {
+        findType(type).forEach(addressQueue::offer);
     }
 }

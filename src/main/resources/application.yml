@@ -1,19 +1,30 @@
 server:
   port: 8989
 spring:
-  profiles:
-    active: dev
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     url:
     username:
     password:
-
+  activemq:
+    broker-url:
+    user:
+    password:
+    in-memory: true
+    pool:
+      enabled: false
+  redis:
+    database: 1
+    host:
+    port:
+    password:
 mybatis:
   mapper-locations: classpath*:/mapper/*.xml
   type-aliases-package: com.blockchain.wallet.entity
 
 privateEth:
+  #节点的服务列表
+  server: ""
   #钱包统一使用的gasList(私有链)
   gas-limit:
   #系统内部转账时候需要的gasPrice(私有链)
@@ -28,8 +39,8 @@ job:
   #扫块
   scanBlock:
     #1s
-    job-time: 1000
-    init-block-height: 0
+    job-time: 500
+    init-block-height: 12273
     #关闭该功能
     enable: true
   #构建交易
@@ -48,7 +59,7 @@ job:
     min-balance: 1000
     #系统地址最大额度
     max-balance: 10000
-    #公有链
+  #公有链
   publicChain:
     build:
       job-time: 5000
@@ -57,10 +68,26 @@ job:
     confirm:
       job-time: 15000
       enable: false
+  #构建交易订单job
+  txOrder:
+    job-time: 5000
+    enable: false
 logging:
   level:
     root: info
 
 erc:
   accuracy: 18
+
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone:
+
+
 

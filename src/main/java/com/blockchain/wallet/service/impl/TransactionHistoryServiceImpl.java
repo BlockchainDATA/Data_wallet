@@ -1,7 +1,6 @@
 package com.blockchain.wallet.service.impl;
 
 import com.blockchain.wallet.entity.TransactionHistoryEntity;
-import com.blockchain.wallet.enums.TransactionTypeEnum;
 import com.blockchain.wallet.mapper.ITransactionHistoryMapper;
 import com.blockchain.wallet.service.ITransactionHistoryService;
 import org.springframework.stereotype.Service;
