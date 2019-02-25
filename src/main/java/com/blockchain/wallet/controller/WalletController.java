@@ -43,7 +43,7 @@ public class WalletController {
         if (StringUtils.isEmpty(addr)) {
             return ActionResult.New(1, "创建用户失败");
         }
-        log.info("生成的钱包地址:{}", addr);
+        log.info("Generated wallet address:{}", addr);
         return ActionResult.New(addr);
     }
 

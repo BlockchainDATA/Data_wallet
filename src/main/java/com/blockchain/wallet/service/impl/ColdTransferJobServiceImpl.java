@@ -72,7 +72,7 @@ public class ColdTransferJobServiceImpl implements IColdTransferJobService {
             if (AddressStateEnum.UNLOCK.getCode().equals(mainAddr.getState())) {
                 String value = CurrencyMathUtil.subtract(maxBalance, systemAddr.getBalance());
                 String transactionSign = web3jUtil.getETHTransactionSign(mainAddr.getPrivateKey(), mainAddr.getNonce(), systemAddr.getWalletAddress(), gasPrice, new BigInteger(gasLimit), value);
-                String txHash = web3jUtil.getTxHash(systemAddr.getWalletAddress(),transactionSign, ethNodeList.get(RandomUtil.getRandomInt(ethNodeList.size())));
+                String txHash = web3jUtil.getTxHash(systemAddr.getWalletAddress(),transactionSign);
                 if (StringUtils.isEmpty(txHash)) {
                     log.error("Failed to get txHash,address:{}", mainAddr.getWalletAddress());
                     continue;
@@ -84,7 +84,7 @@ public class ColdTransferJobServiceImpl implements IColdTransferJobService {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    TransactionReceipt transactionReceipt = web3jUtil.getTransactionReceipt(txHash, ethNodeList.get(RandomUtil.getRandomInt(ethNodeList.size())));
+                    TransactionReceipt transactionReceipt = web3jUtil.getTransactionReceipt(txHash);
                     log.info("Transaction receipt for main account transfer", transactionReceipt);
                     if (!StringUtils.isEmpty(transactionReceipt)) {
                         //交易已经打包在块上
@@ -98,11 +98,11 @@ public class ColdTransferJobServiceImpl implements IColdTransferJobService {
         }
         transactionHistoryService.batchInsertTxHistoryEntity(txHistoryList);
         //获取主账户余额
-        String balance = web3jUtil.getBalance(mainAddr.getWalletAddress(), ethNodeList.get(RandomUtil.getRandomInt(ethNodeList.size())));
+        String balance = web3jUtil.getBalance(mainAddr.getWalletAddress());
         if (!StringUtils.isEmpty(balance)) {
             mainAddr.setBalance(balance);
         }
-        BigInteger nonce = web3jUtil.getNonce(mainAddr.getWalletAddress(), ethNodeList.get(RandomUtil.getRandomInt(ethNodeList.size())));
+        BigInteger nonce = web3jUtil.getNonce(mainAddr.getWalletAddress());
         if (null != nonce) {
             mainAddr.setNonce(nonce);
         }

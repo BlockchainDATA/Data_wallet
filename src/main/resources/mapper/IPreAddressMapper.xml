@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blockchain.wallet.mapper.IPreAddressMapper">
+    <select id="getPreAddress" resultType="PreAddressEntity">
+        select id,address,password,private_key as privateKey,create_time as createTime from pre_address limit 1
+    </select>
+    <insert id="insertPreAddress" parameterType="PreAddressEntity">
+        insert into pre_address(address,password,private_key,create_time) values (#{address},#{password},#{privateKey},#{createTime});
+    </insert>
+    <insert id="batchInsertPreAddress" parameterType="PreAddressEntity">
+        insert into pre_address(address,password,private_key,create_time) values
+        <foreach collection="list" item="it" separator=",">
+            (#{it.address},#{it.password},#{it.privateKey},#{it.createTime})
+        </foreach>
+    </insert>
+    <delete id="deletePreAddress" parameterType="string">
+        delete from pre_address where address=#{address}
+    </delete>
+    <select id="getCount" resultType="int">
+        select count(*) from pre_address
+    </select>
+</mapper>

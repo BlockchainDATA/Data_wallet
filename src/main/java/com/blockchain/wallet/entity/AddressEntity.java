@@ -131,4 +131,15 @@ public class AddressEntity {
     public void setAddrType(Integer addrType) {
         this.addrType = addrType;
     }
+
+    public AddressEntity(String walletAddress, String privateKey, String password, Integer addrType) {
+        this.walletAddress = walletAddress;
+        this.privateKey = privateKey;
+        this.password = password;
+        this.addrType = addrType;
+    }
+
+    public AddressEntity() {
+
+    }
 }

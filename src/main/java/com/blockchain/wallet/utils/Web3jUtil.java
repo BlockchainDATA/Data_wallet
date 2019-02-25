@@ -28,6 +28,7 @@ import javax.annotation.Resource;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * web3j的工具类
@@ -45,14 +46,17 @@ public class Web3jUtil {
     @Value("${erc.accuracy}")
     private Integer accuracy;
 
+    @Value("#{'${privateEth.server}'.split(',')}")
+    public List<String> ethNodeList;
 
     /**
      * 创建钱包地址
      *
      * @return
      */
-    public AddressEntity createAddr(String ethNodeUrl) {
-        Admin admin = Admin.build(new HttpService(ethNodeUrl));
+    public AddressEntity createAddr() {
+        String url = getHttpServiceUrl();
+        Admin admin = Admin.build(HttpServiceUtil.httpServiceMap.get(url));
         try {
             //获取随机密码
             String password = randomString();
@@ -62,7 +66,7 @@ public class Web3jUtil {
                 return null;
             }
             String accountId = response.getAccountId();
-            String privateKey = getAddresPrivateKey(accountId, password, ethNodeUrl);
+            String privateKey = getAddresPrivateKey(accountId, password, url);
             if (StringUtils.isEmpty(privateKey)) {
                 log.error("Failed to obtain the user's private key, address:{}", accountId);
                 return null;
@@ -99,11 +103,15 @@ public class Web3jUtil {
      * 获取账户余额单位 eth
      *
      * @param addr
-     * @param ethNodeUrl 节点地址
      * @return
      */
-    public String getBalance(String addr, String ethNodeUrl) {
-        Web3j web3j = Web3j.build(new HttpService(ethNodeUrl));
+    public String getBalance(String addr, String... url) {
+        Web3j web3j;
+        if (url.length > 0) {
+            web3j = Web3j.build(new HttpService(url[0]));
+        } else {
+            web3j = Web3j.build(HttpServiceUtil.httpServiceMap.get(getHttpServiceUrl()));
+        }
         try {
             EthGetBalance response = web3j.ethGetBalance(addr, DefaultBlockParameterName.LATEST).send();
             if (checkResult(response)) {
@@ -194,11 +202,15 @@ public class Web3jUtil {
      *
      * @param fromAddress from地址用于日志使用
      * @param hexValue    交易签名
-     * @param ethNodeUrl  节点地址
      * @return
      */
-    public String getTxHash(String fromAddress, String hexValue, String ethNodeUrl) {
-        Web3j web3j = Web3j.build(new HttpService(ethNodeUrl));
+    public String getTxHash(String fromAddress, String hexValue, String... url) {
+        Web3j web3j;
+        if (url.length > 0) {
+            web3j = Web3j.build(new HttpService(url[0]));
+        } else {
+            web3j = Web3j.build(HttpServiceUtil.httpServiceMap.get(getHttpServiceUrl()));
+        }
         String txHash = null;
         try {
             EthSendTransaction response = web3j.ethSendRawTransaction(hexValue).send();
@@ -218,11 +230,10 @@ public class Web3jUtil {
     /**
      * 获取块高
      *
-     * @param ethNodeUrl 节点地址
      * @return
      */
-    public BigInteger getBlockHeight(String ethNodeUrl) {
-        Web3j web3j = Web3j.build(new HttpService(ethNodeUrl));
+    public BigInteger getBlockHeight() {
+        Web3j web3j = Web3j.build(HttpServiceUtil.httpServiceMap.get(getHttpServiceUrl()));
         try {
             EthBlockNumber response = web3j.ethBlockNumber().send();
             if (checkResult(response)) {
@@ -240,12 +251,16 @@ public class Web3jUtil {
     /**
      * 获取nonce值
      *
-     * @param addr       地址
-     * @param ethNodeUrl 节点地址
+     * @param addr 地址
      * @return
      */
-    public BigInteger getNonce(String addr, String ethNodeUrl) {
-        Web3j web3j = Web3j.build(new HttpService(ethNodeUrl));
+    public BigInteger getNonce(String addr, String... url) {
+        Web3j web3j;
+        if (url.length > 0) {
+            web3j = Web3j.build(new HttpService(url[0]));
+        } else {
+            web3j = Web3j.build(HttpServiceUtil.httpServiceMap.get(getHttpServiceUrl()));
+        }
         try {
             EthGetTransactionCount response = web3j.ethGetTransactionCount(addr, DefaultBlockParameterName.LATEST).send();
             if (checkResult(response)) {
@@ -264,12 +279,16 @@ public class Web3jUtil {
     /**
      * 根据交易hash获取交易收据
      *
-     * @param txHash     交易hash
-     * @param ethNodeUrl 节点地址
+     * @param txHash 交易hash
      * @return
      */
-    public TransactionReceipt getTransactionReceipt(String txHash, String ethNodeUrl) {
-        Web3j web3j = Web3j.build(new HttpService(ethNodeUrl));
+    public TransactionReceipt getTransactionReceipt(String txHash, String... url) {
+        Web3j web3j;
+        if (url.length > 0) {
+            web3j = Web3j.build(new HttpService(url[0]));
+        } else {
+            web3j = Web3j.build(HttpServiceUtil.httpServiceMap.get(getHttpServiceUrl()));
+        }
         try {
             EthGetTransactionReceipt response = web3j.ethGetTransactionReceipt(txHash).send();
             if (checkResult(response)) {
@@ -288,12 +307,11 @@ public class Web3jUtil {
     /**
      * 根据交易hash获取交易详情
      *
-     * @param txHash     交易hash
-     * @param ethNodeUrl 节点地址
+     * @param txHash 交易hash
      * @return
      */
-    public Transaction getTransactionByHash(String txHash, String ethNodeUrl) {
-        Web3j web3j = Web3j.build(new HttpService(ethNodeUrl));
+    public Transaction getTransactionByHash(String txHash) {
+        Web3j web3j = Web3j.build(HttpServiceUtil.httpServiceMap.get(getHttpServiceUrl()));
         try {
             EthTransaction response = web3j.ethGetTransactionByHash(txHash).send();
             if (checkResult(response)) {
@@ -312,11 +330,10 @@ public class Web3jUtil {
      * 扫块
      *
      * @param blockHeight 块高
-     * @param ethNodeUrl  节点地址
      * @return
      */
-    public EthBlock scanBlock(BigInteger blockHeight, String ethNodeUrl) {
-        Web3j web3j = Web3j.build(new HttpService(ethNodeUrl));
+    public EthBlock scanBlock(BigInteger blockHeight) {
+        Web3j web3j = Web3j.build(HttpServiceUtil.httpServiceMap.get(getHttpServiceUrl()));
         try {
             EthBlock response = web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(blockHeight), false).send();
             if (checkResult(response)) {
@@ -381,6 +398,15 @@ public class Web3jUtil {
         json.put("addr", addr);
         json.put("password", password);
         return okHttpUtil.postRequest(json, ethNodeUrl.replace("8545", UrlConstUtil.PRIVATE_KEY_PORT));
+    }
+
+    /**
+     * 获取服务器url
+     *
+     * @return
+     */
+    private String getHttpServiceUrl() {
+        return ethNodeList.get(RandomUtil.getRandomInt(ethNodeList.size()));
     }
 
 }

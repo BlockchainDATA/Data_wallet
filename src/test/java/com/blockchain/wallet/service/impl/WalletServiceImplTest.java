@@ -13,11 +13,11 @@ import javax.annotation.Resource;
 public class WalletServiceImplTest {
     @Resource
     private IWalletService walletService;
-
-    @Test
-    public void createAddr() {
-        for (int i = 0; i < 100; i++) {
-            System.out.println(walletService.createAddr());
-        }
-    }
+//
+//    @Test
+//    public void createAddr() {
+//        for (int i = 0; i < 100; i++) {
+//            System.out.println(walletService.createAddr());
+//        }
+//    }
 }

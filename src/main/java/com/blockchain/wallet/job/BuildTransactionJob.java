@@ -4,12 +4,14 @@ import com.blockchain.wallet.entity.TransactionOrderEntity;
 import com.blockchain.wallet.enums.TransactionOrderStateEnum;
 import com.blockchain.wallet.service.IBuildTransactionJobService;
 import com.blockchain.wallet.service.ITransactionOrderService;
+import com.blockchain.wallet.utils.ExecutorServiceUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import java.util.List;
 
@@ -29,6 +31,7 @@ public class BuildTransactionJob {
     private IBuildTransactionJobService buildTransactionJobService;
     @Resource
     private ITransactionOrderService transactionOrderService;
+
     @Scheduled(fixedRateString = "${job.transaction.job-time}")
     public void buildTransactionJob() {
         log.info("Timing Task Opening for Constructing Transactions...");
@@ -38,5 +41,10 @@ public class BuildTransactionJob {
             return;
         }
         buildTransactionJobService.buildTransaction(txOrderList);
+    }
+
+    @PreDestroy
+    public void destroy() {
+        ExecutorServiceUtil.executorService.shutdownNow();
     }
 }

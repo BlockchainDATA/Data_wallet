@@ -63,9 +63,9 @@
     </sql>
     <insert id="insertTransactionHistoryEntity" parameterType="TransactionHistoryEntity">
         insert into transaction_history  (transaction_id,transaction_hash,transaction_from,
-        transaction_to,value,gas_price,gas_limit,nonce,transaction_type ,state,create_time,block_hash,block_number)
+        transaction_to,value,gas_price,gas_limit,nonce,transaction_type ,sign,state,create_time,block_hash,block_number)
         values (#{transactionId},#{transactionHash},#{transactionFrom},#{transactionTo},#{value},
-        #{gasPrice},#{gasLimit},#{nonce},#{transactionType},#{state},#{createTime},#{blockHash},#{blockNumber})
+        #{gasPrice},#{gasLimit},#{nonce},#{transactionType},#{sign},#{state},#{createTime},#{blockHash},#{blockNumber})
     </insert>
 
     <update id="updateTransactionHistoryEntity" parameterType="TransactionHistoryEntity">

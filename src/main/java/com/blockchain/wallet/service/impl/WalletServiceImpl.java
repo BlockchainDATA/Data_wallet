@@ -1,6 +1,7 @@
 package com.blockchain.wallet.service.impl;
 
 import com.blockchain.wallet.entity.*;
+import com.blockchain.wallet.enums.AddressTypeEnum;
 import com.blockchain.wallet.enums.ScanKeyEnum;
 import com.blockchain.wallet.enums.TransactionOrderTypeEnum;
 import com.blockchain.wallet.enums.TransactionTypeEnum;
@@ -12,6 +13,7 @@ import com.blockchain.wallet.utils.Web3jUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
@@ -48,10 +50,23 @@ public class WalletServiceImpl implements IWalletService {
     private String gasPrice;
     @Value("#{'${privateEth.server}'.split(',')}")
     public List<String> ethNodeList;
+    @Resource
+    private IPreAddressService preAddressService;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public String createAddr(Integer type) {
-        AddressEntity addressEntity = web3jUtil.createAddr(ethNodeList.get(RandomUtil.getRandomInt(ethNodeList.size())));
+        Integer count = preAddressService.getCount();
+        AddressEntity addressEntity;
+        if (count == null || count == 0) {
+            log.info("No pre-production address...");
+            addressEntity = web3jUtil.createAddr();
+        } else {
+            PreAddressEntity preAddress = preAddressService.getPreAddress();
+            addressEntity = new AddressEntity(preAddress.getAddress(), preAddress.getPrivateKey(), preAddress.getPassword(), AddressTypeEnum.USER_ADDR.getCode());
+            preAddressService.deletePreAddress(preAddress.getAddress());
+        }
+
         if (null == addressEntity) {
             log.error("Failed to create user address");
             return null;
@@ -155,14 +170,14 @@ public class WalletServiceImpl implements IWalletService {
 
     @Override
     public String privateKeyTransfer(String fromAddress, String toAddress, String privateKey, String value) {
-        BigInteger nonce = web3jUtil.getNonce(fromAddress, ethNodeList.get(RandomUtil.getRandomInt(ethNodeList.size())));
+        BigInteger nonce = web3jUtil.getNonce(fromAddress);
         //获取交易签名
         String txSign = web3jUtil.getETHTransactionSign(privateKey, nonce, toAddress, this.gasPrice, new BigInteger(this.gasLimit), value);
         if (StringUtils.isEmpty(txSign)) {
             log.error("Transaction signature failed,fromAddress:{}", fromAddress);
             return null;
         }
-        String txHash = web3jUtil.getTxHash(fromAddress, txSign, ethNodeList.get(RandomUtil.getRandomInt(ethNodeList.size())));
+        String txHash = web3jUtil.getTxHash(fromAddress, txSign);
         if (StringUtils.isEmpty(txHash)) {
             log.error("Transaction broadcasting failed,fromAddress:{}", fromAddress);
             return null;

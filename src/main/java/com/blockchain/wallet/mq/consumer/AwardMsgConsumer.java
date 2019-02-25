@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 
 /**
  * 奖励的消费者
+ *
  * @author QiShuo
  * @version 1.0
  * @create 2018/12/5 6:36 PM
@@ -23,11 +24,12 @@ public class AwardMsgConsumer {
 
     /**
      * 接收消息
+     *
      * @param text
      */
     //@JmsListener(destination = "award.msg.queue")
     public void receive(String text) {
-        log.info("AwardMsgConsumer收到的报文为:" + text);
+        log.info("AwardMsgConsumer The message received is:{}", text);
         TransactionParamEntity transactionParamEntity = JSONObject.parseObject(text, TransactionParamEntity.class);
         walletService.buildTransaction(transactionParamEntity);
     }

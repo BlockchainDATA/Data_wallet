@@ -29,10 +29,10 @@ public class BuildTransactionOrderJob {
     private IBuildTransactionOrderJobService buildTransactionOrderJobService;
     @Scheduled(fixedRateString = "${job.txOrder.job-time}")
     public void buildTransactionOrder() {
-        log.info("获取交易订单任务开始...");
+        log.info("Getting the Transaction Order Task Start...");
         List<TransactionParamEntity> dtaTransactionList = moneyClient.getDtaTransaction().getData();
         if (CollectionUtils.isEmpty(dtaTransactionList)) {
-            log.info("没有交易订单...");
+            log.info("No Transaction orders...");
             return;
         }
         buildTransactionOrderJobService.buildTransactionOrder(dtaTransactionList);

@@ -1,0 +1,1 @@
+ALTER TABLE `wallet`.`transaction_order` ADD COLUMN `retry` int(11) DEFAULT 0 COMMENT '重试次数.默认0' AFTER `memo`;

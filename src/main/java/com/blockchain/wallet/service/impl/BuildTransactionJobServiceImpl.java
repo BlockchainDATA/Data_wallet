@@ -1,5 +1,6 @@
 package com.blockchain.wallet.service.impl;
 
+import com.blockchain.wallet.client.MoneyClient;
 import com.blockchain.wallet.entity.AddressEntity;
 import com.blockchain.wallet.entity.TransactionOrderEntity;
 import com.blockchain.wallet.enums.AddressTypeEnum;
@@ -8,12 +9,14 @@ import com.blockchain.wallet.service.IAddressService;
 import com.blockchain.wallet.service.IBuildTransactionJobService;
 import com.blockchain.wallet.service.ITransactionHistoryService;
 import com.blockchain.wallet.service.ITransactionOrderService;
+import com.blockchain.wallet.utils.ExecutorServiceUtil;
 import com.blockchain.wallet.utils.SystemAddressUtil;
 import com.blockchain.wallet.utils.Web3jUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -39,6 +42,8 @@ public class BuildTransactionJobServiceImpl implements IBuildTransactionJobServi
     private ITransactionOrderService transactionOrderService;
     @Resource
     private ITransactionHistoryService transactionHistoryService;
+    @Resource
+    private MoneyClient moneyClient;
     @Value("${privateEth.gas-limit}")
     private String gasLimit;
     @Value("${publicEth.gas-limit}")
@@ -52,9 +57,10 @@ public class BuildTransactionJobServiceImpl implements IBuildTransactionJobServi
 
     @Override
     public void buildTransaction(List<TransactionOrderEntity> txOrderList) {
-        ExecutorService executorService = Executors.newFixedThreadPool(10);
-        SystemAddressUtil.addressQueue = new ConcurrentLinkedQueue<>();
-        addressService.setAddressQueue(AddressTypeEnum.SYSTEM_ADDR.getCode());
+        ExecutorService executorService = ExecutorServiceUtil.executorService;
+        if (CollectionUtils.isEmpty(SystemAddressUtil.addressQueue)) {
+            addressService.setAddressQueue(AddressTypeEnum.SYSTEM_ADDR.getCode());
+        }
         BuildTransactionHandler buildTransactionHandler;
         for (TransactionOrderEntity txOrder : txOrderList) {
             ConcurrentLinkedQueue<AddressEntity> addressQueue = SystemAddressUtil.addressQueue;
@@ -62,10 +68,11 @@ public class BuildTransactionJobServiceImpl implements IBuildTransactionJobServi
             if (Objects.isNull(addressEntity)) {
                 continue;
             }
-            buildTransactionHandler = new BuildTransactionHandler(addressService, web3jUtil, transactionOrderService, transactionHistoryService, txOrder, ethNodeList, gasLimit, addressEntity);
+            buildTransactionHandler = new BuildTransactionHandler(addressService, web3jUtil, transactionOrderService, transactionHistoryService, txOrder, ethNodeList, gasLimit, addressEntity, moneyClient);
             executorService.execute(buildTransactionHandler);
         }
-        executorService.shutdown();
+        //关闭线程池
+        //executorService.shutdown();
     }
 }
 

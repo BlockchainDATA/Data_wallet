@@ -41,7 +41,7 @@ public class OkHttpUtilTest {
     @Test
     public void psotRequest() {
         JSONObject json = new JSONObject();
-        json.put("addr", "0x9407fdd6218b8b7a9b8741f0e88b3f872877ae0f");
+        json.put("addr", "");
         json.put("password", "");
 
         System.out.println(okHttpUtil.postRequest(json, ""));
@@ -49,7 +49,7 @@ public class OkHttpUtilTest {
 
     @Test
     public void getTokenBalance() {
-        System.out.println(web3jUtil.getTokenBalance("0x46835BE24E640EEaa523ef6283990a255331782e"));
+        System.out.println(web3jUtil.getTokenBalance(""));
     }
 
     @Test

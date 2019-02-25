@@ -51,7 +51,7 @@ public class EthScanBlockJob {
             nextScanBlockHeight = blockHeight.add(BigInteger.valueOf(1));
         }
         //链上最高块
-        BigInteger blockHeight = web3jUtil.getBlockHeight(ethNodeList.get(RandomUtil.getRandomInt(ethNodeList.size())));
+        BigInteger blockHeight = web3jUtil.getBlockHeight();
         if (null == blockHeight) {
             log.error("Acquisition Block High Failure...");
             return;

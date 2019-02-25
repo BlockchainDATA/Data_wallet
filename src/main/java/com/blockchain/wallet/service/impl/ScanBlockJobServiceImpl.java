@@ -61,7 +61,7 @@ public class ScanBlockJobServiceImpl implements IScanBlockJobService {
     @Override
     public void scanBlock(BigInteger blockHeight, ScanBlockConfigEntity scanBlockConfigEntity) {
 
-        EthBlock ethBlockInfo = web3jUtil.scanBlock(blockHeight, ethNodeList.get(RandomUtil.getRandomInt(ethNodeList.size())));
+        EthBlock ethBlockInfo = web3jUtil.scanBlock(blockHeight);
         if (null == ethBlockInfo.getResult()) {
             log.error("Acquisition Block High Failure,Block High:{}", blockHeight);
             return;
@@ -93,9 +93,9 @@ public class ScanBlockJobServiceImpl implements IScanBlockJobService {
             txHistoryList = txHistoryList.stream().filter(txHistory -> txHashList.contains(txHistory.getTransactionHash()))
                     .peek(txHistory -> {
                         //获取交易信息
-                        Transaction txInfo = web3jUtil.getTransactionByHash(txHistory.getTransactionHash(), ethNodeList.get(RandomUtil.getRandomInt(ethNodeList.size())));
+                        Transaction txInfo = web3jUtil.getTransactionByHash(txHistory.getTransactionHash());
                         //获取交易收据
-                        TransactionReceipt txReceipt = web3jUtil.getTransactionReceipt(txHistory.getTransactionHash(), ethNodeList.get(RandomUtil.getRandomInt(ethNodeList.size())));
+                        TransactionReceipt txReceipt = web3jUtil.getTransactionReceipt(txHistory.getTransactionHash());
                         txHistory.setBlockHash(txReceipt.getBlockHash());
                         txHistory.setBlockNumber(txReceipt.getBlockNumber());
                         txHistory.setGasLimit(txInfo.getGas());
@@ -125,7 +125,7 @@ public class ScanBlockJobServiceImpl implements IScanBlockJobService {
             return;
         }
         AddressEntity addressEntity = addressList.get(0);
-        String balance = web3jUtil.getBalance(addressEntity.getWalletAddress(), ethNodeList.get(RandomUtil.getRandomInt(ethNodeList.size())));
+        String balance = web3jUtil.getBalance(addressEntity.getWalletAddress());
         if (StringUtils.isEmpty(balance)) {
             log.error("Failed to obtain master account balance");
             return;
@@ -167,9 +167,9 @@ public class ScanBlockJobServiceImpl implements IScanBlockJobService {
         List<TransactionHistoryEntity> txHistoryDepositList = new ArrayList<>();
         for (String txHash : txHashList) {
             //获取交易信息
-            Transaction txInfo = web3jUtil.getTransactionByHash(txHash, ethNodeList.get(RandomUtil.getRandomInt(ethNodeList.size())));
+            Transaction txInfo = web3jUtil.getTransactionByHash(txHash);
             //获取交易收据
-            TransactionReceipt txReceipt = web3jUtil.getTransactionReceipt(txHash, ethNodeList.get(RandomUtil.getRandomInt(ethNodeList.size())));
+            TransactionReceipt txReceipt = web3jUtil.getTransactionReceipt(txHash);
             String toAddr = txInfo.getTo();
             AddressEntity toAddress = addressService.findAddress(toAddr);
             if (null == toAddress) {
