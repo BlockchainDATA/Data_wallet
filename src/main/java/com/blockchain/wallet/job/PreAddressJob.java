@@ -22,7 +22,7 @@ public class PreAddressJob {
     @Resource
     private IPreAddressJobService preAddressJobService;
 
-    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "0 15 19 * * ?")
     public void buildPreAddress() {
         log.info("Batch Generation Address Task Starts...");
         preAddressJobService.buildPreAddress();

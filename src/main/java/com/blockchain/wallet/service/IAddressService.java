@@ -95,8 +95,7 @@ public interface IAddressService {
 
     /**
      *
-     * @param type
      */
-    void setAddressQueue(Integer type);
+    void setAddressQueue();
 
 }

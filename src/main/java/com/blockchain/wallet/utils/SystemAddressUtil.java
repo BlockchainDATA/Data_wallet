@@ -10,5 +10,5 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @create 2019/1/29 1:49 PM
  */
 public class SystemAddressUtil {
-    public static ConcurrentLinkedQueue<AddressEntity> addressQueue = new ConcurrentLinkedQueue<>();
+    public  static  ConcurrentLinkedQueue<AddressEntity> addressQueue = new ConcurrentLinkedQueue<>();
 }

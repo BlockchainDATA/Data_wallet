@@ -10,7 +10,6 @@ import com.blockchain.wallet.service.IAddressService;
 import com.blockchain.wallet.service.IColdTransferJobService;
 import com.blockchain.wallet.service.ITransactionHistoryService;
 import com.blockchain.wallet.utils.CurrencyMathUtil;
-import com.blockchain.wallet.utils.RandomUtil;
 import com.blockchain.wallet.utils.Web3jUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

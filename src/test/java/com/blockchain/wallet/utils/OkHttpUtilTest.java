@@ -42,7 +42,7 @@ public class OkHttpUtilTest {
     public void psotRequest() {
         JSONObject json = new JSONObject();
         json.put("addr", "");
-        json.put("password", "");
+        json.put("", "");
 
         System.out.println(okHttpUtil.postRequest(json, ""));
     }

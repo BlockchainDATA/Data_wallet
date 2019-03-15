@@ -10,7 +10,6 @@ import com.blockchain.wallet.service.IAddressService;
 import com.blockchain.wallet.service.ITransactionHistoryService;
 import com.blockchain.wallet.service.ITransactionOrderService;
 import com.blockchain.wallet.utils.CurrencyMathUtil;
-import com.blockchain.wallet.utils.RandomUtil;
 import com.blockchain.wallet.utils.Web3jUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
@@ -22,7 +21,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * @author QiShuo
@@ -36,19 +34,17 @@ public class BuildTransactionHandler implements Runnable {
     private ITransactionOrderService transactionOrderService;
     private ITransactionHistoryService transactionHistoryService;
     private TransactionOrderEntity txOrder;
-    private List<String> ethNodeList;
 
     private String gasLimit;
     private AddressEntity fromAddress;
     private MoneyClient moneyClient;
 
-    public BuildTransactionHandler(IAddressService addressService, Web3jUtil web3jUtil, ITransactionOrderService transactionOrderService, ITransactionHistoryService transactionHistoryService, TransactionOrderEntity txOrder, List<String> ethNodeList, String gasLimit, AddressEntity fromAddress, MoneyClient moneyClient) {
+    public BuildTransactionHandler(IAddressService addressService, Web3jUtil web3jUtil, ITransactionOrderService transactionOrderService, ITransactionHistoryService transactionHistoryService, TransactionOrderEntity txOrder, String gasLimit, AddressEntity fromAddress, MoneyClient moneyClient) {
         this.addressService = addressService;
         this.web3jUtil = web3jUtil;
         this.transactionOrderService = transactionOrderService;
         this.transactionHistoryService = transactionHistoryService;
         this.txOrder = txOrder;
-        this.ethNodeList = ethNodeList;
         this.gasLimit = gasLimit;
         this.fromAddress = fromAddress;
         this.moneyClient = moneyClient;
@@ -102,7 +98,7 @@ public class BuildTransactionHandler implements Runnable {
                 List<String> list = new ArrayList<>();
                 list.add(txOrder.getTransactionId());
                 jsonObject.put("transactionIds", list);
-                jsonObject.put("state", AwardStateEnum.WALLET_BUILD.getCode());
+                jsonObject.put("state", AwardStateEnum.FAIL.getCode());
                 moneyClient.updateAwardHistoryState(jsonObject);
                 log.info("Failure to get txHash, transaction failure, order id{}", txOrder.getTransactionId());
                 return;

@@ -253,12 +253,12 @@ public class ScanBlockJobServiceImpl implements IScanBlockJobService {
                         paybackFee = CurrencyMathUtil.multiply(txHistory.getGasPrice(), String.valueOf(unusedGas));
                         balance = CurrencyMathUtil.add(addressEntity.getBalance(), paybackFee);
                         addressEntity.setBalance(balance);
-                        // moneyClient.updateDta(addressEntity.getWalletAddress(), balance);
                     }
                     //解锁地址
                     addressEntity.setState(AddressStateEnum.UNLOCK.getCode());
                     addressEntity.setUpdateTime(ZonedDateTime.now(ZoneOffset.UTC));
                     if (AddressTypeEnum.SYSTEM_ADDR.getCode().equals(addressEntity.getAddrType())) {
+                        log.info("The unlocked address is:{}", addressEntity.getWalletAddress());
                         SystemAddressUtil.addressQueue.offer(addressEntity);
                     }
                     updateAddressEntities.add(addressEntity);

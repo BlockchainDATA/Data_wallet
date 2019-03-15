@@ -72,6 +72,10 @@ job:
   txOrder:
     job-time: 5000
     enable: false
+  preAddress:
+    enable: true
+    number: 100
+
 logging:
   level:
     root: info

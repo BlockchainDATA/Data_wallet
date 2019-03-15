@@ -1,11 +1,13 @@
 package com.blockchain.wallet.service.impl;
 
 import com.blockchain.wallet.entity.AddressEntity;
+import com.blockchain.wallet.enums.AddressTypeEnum;
 import com.blockchain.wallet.mapper.IAddressMapper;
 import com.blockchain.wallet.service.IAddressService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -82,7 +84,8 @@ public class AddressServiceImpl implements IAddressService {
     }
 
     @Override
-    public void setAddressQueue(Integer type) {
-        findType(type).forEach(addressQueue::offer);
+    @PostConstruct
+    public void setAddressQueue() {
+        findType(AddressTypeEnum.SYSTEM_ADDR.getCode()).forEach(addressQueue::offer);
     }
 }
